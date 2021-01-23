@@ -8,7 +8,7 @@ class LiuyanSpider(scrapy.Spider):
     name = 'liuyan'
     base_url = 'https://vp.fact.qq.com/loadmore?'
     start_urls = []
-    for i in range(1,15):
+    for i in range(1,70):
         params = {  
             'page': i 
         } 
@@ -22,7 +22,7 @@ class LiuyanSpider(scrapy.Spider):
             params = {  
                 'id': item["id"] 
             } 
-            yield scrapy.Request(url=article_url+ urlencode(params), callback=self.parse_detail,meta={'tags':item["tag"],'cover':item["cover"],'type':item["explain"]})
+            yield scrapy.Request(url=article_url+ urlencode(params), callback=self.parse_detail,meta={'tags':item["tag"],'cover':f'https:{item["cover"]}','type':item["explain"], 'date': item['date']})
 
     def parse_detail(self,response):
         item = JiaozhenItem()
@@ -35,7 +35,9 @@ class LiuyanSpider(scrapy.Spider):
         item['author'] = response.css('body > div.check_content.text > div.check_content_text.check_content_writer::text').extract_first()
         item['tags'] = response.meta['tags']
         item['pic_url'] = response.meta['cover']
+        item['date'] = response.meta['date']
         item['type'] = response.meta['type']
+        item['category'] = '新冠专项'
         yield item
 
 
